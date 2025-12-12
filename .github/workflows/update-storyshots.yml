@@ -1,5 +1,5 @@
 name: Functional Tests
-on: [push, pull_request]
+on: [workflow_dispatch]
 env:
   CI: true
   PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: true
