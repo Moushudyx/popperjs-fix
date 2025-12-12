@@ -31,4 +31,8 @@ await Promise.all([
     format: 'iife',
     name: 'Popper',
   }),
+  bundle.write({
+    file: 'tests/visual/dist/popper.js',
+    format: 'esm',
+  }),
 ]);

@@ -19,7 +19,9 @@ import {
 import getOffsetParent from '../dom-utils/getOffsetParent';
 import getWindow from '../dom-utils/getWindow';
 import getDocumentElement from '../dom-utils/getDocumentElement';
+import getBoundingClientRect from '../dom-utils/getBoundingClientRect';
 import getComputedStyle from '../dom-utils/getComputedStyle';
+import { isHTMLElement } from '../dom-utils/instanceOf';
 import getBasePlacement from '../utils/getBasePlacement';
 import getVariation from '../utils/getVariation';
 import { round } from '../utils/math';
@@ -113,32 +115,49 @@ export function mapToStyles({
 
     // $FlowFixMe[incompatible-cast]: force type refinement, we compare offsetParent with window above, but Flow doesn't detect it
     offsetParent = (offsetParent: Element);
+    
+    const docElement = getDocumentElement(popper);
+    const isOffsetParentDocument = offsetParent === docElement;
 
     if (
-      placement === top ||
-      ((placement === left || placement === right) && variation === end)
+      !isOffsetParentDocument &&
+      (placement === top ||
+      ((placement === left || placement === right) && variation === end))
     ) {
       sideY = bottom;
+      const docElement = getDocumentElement(popper);
       const offsetY =
         isFixed && offsetParent === win && win.visualViewport
           ? win.visualViewport.height
+          : isHTMLElement(offsetParent) && offsetParent !== docElement
+          ? // read scaled client rect height to match scaled popperRect for regular elements
+            getBoundingClientRect(offsetParent, true).height
           : // $FlowFixMe[prop-missing]
             offsetParent[heightProp];
+      
       y -= offsetY - popperRect.height;
+      
       y *= gpuAcceleration ? 1 : -1;
     }
 
     if (
-      placement === left ||
-      ((placement === top || placement === bottom) && variation === end)
+      !isOffsetParentDocument &&
+      (placement === left ||
+      ((placement === top || placement === bottom) && variation === end))
     ) {
       sideX = right;
+      const docElement = getDocumentElement(popper);
       const offsetX =
         isFixed && offsetParent === win && win.visualViewport
           ? win.visualViewport.width
+          : isHTMLElement(offsetParent) && offsetParent !== docElement
+          ? // read scaled client rect width to match scaled popperRect for regular elements
+            getBoundingClientRect(offsetParent, true).width
           : // $FlowFixMe[prop-missing]
             offsetParent[widthProp];
+      
       x -= offsetX - popperRect.width;
+      
       x *= gpuAcceleration ? 1 : -1;
     }
   }
@@ -221,16 +240,20 @@ function computeStyles({ state, options }: ModifierArguments<Options>) {
   };
 
   if (state.modifiersData.popperOffsets != null) {
+    
+    const popperStyles = mapToStyles({
+      ...commonStyles,
+      offsets: state.modifiersData.popperOffsets,
+      position: state.options.strategy,
+      adaptive,
+      roundOffsets,
+    });
+    
     state.styles.popper = {
       ...state.styles.popper,
-      ...mapToStyles({
-        ...commonStyles,
-        offsets: state.modifiersData.popperOffsets,
-        position: state.options.strategy,
-        adaptive,
-        roundOffsets,
-      }),
+      ...popperStyles,
     };
+    
   }
 
   if (state.modifiersData.arrow != null) {

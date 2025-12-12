@@ -62,7 +62,10 @@ export default function detectOverflow(
     rootBoundary
   );
 
-  const referenceClientRect = getBoundingClientRect(state.elements.reference);
+  const referenceClientRect = getBoundingClientRect(
+    state.elements.reference,
+    true
+  );
 
   const popperOffsets = computeOffsets({
     reference: referenceClientRect,

@@ -8,6 +8,7 @@ import getWindowScrollBarX from './getWindowScrollBarX';
 import getDocumentElement from './getDocumentElement';
 import isScrollParent from './isScrollParent';
 import { round } from '../utils/math';
+import getBodyElement from './getBodyElement';
 
 function isElementScaled(element: HTMLElement) {
   const rect = element.getBoundingClientRect();
@@ -28,9 +29,15 @@ export default function getCompositeRect(
   const offsetParentIsScaled =
     isHTMLElement(offsetParent) && isElementScaled(offsetParent);
   const documentElement = getDocumentElement(offsetParent);
+  const documentElementIsScaled =
+    isHTMLElement(documentElement) && isElementScaled(documentElement);
+  const bodyElement = getBodyElement(offsetParent);
+  const bodyElementIsScaled = isHTMLElement(bodyElement) && isElementScaled(bodyElement);
+  const includeScale = offsetParentIsScaled || documentElementIsScaled || bodyElementIsScaled;
+
   const rect = getBoundingClientRect(
     elementOrVirtualElement,
-    offsetParentIsScaled
+    includeScale
   );
 
   let scroll = { scrollLeft: 0, scrollTop: 0 };

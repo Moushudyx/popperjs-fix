@@ -17,7 +17,7 @@ import rectToClientRect from '../utils/rectToClientRect';
 import { max, min } from '../utils/math';
 
 function getInnerBoundingClientRect(element: Element) {
-  const rect = getBoundingClientRect(element);
+  const rect = getBoundingClientRect(element, true);
 
   rect.top = rect.top + element.clientTop;
   rect.left = rect.left + element.clientLeft;

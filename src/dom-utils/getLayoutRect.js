@@ -5,7 +5,7 @@ import getBoundingClientRect from './getBoundingClientRect';
 // Returns the layout rect of an element relative to its offsetParent. Layout
 // means it doesn't take into account transforms.
 export default function getLayoutRect(element: HTMLElement): Rect {
-  const clientRect = getBoundingClientRect(element);
+  const clientRect = getBoundingClientRect(element, true);
 
   // Use the clientRect sizes if it's not been transformed.
   // Fixes https://github.com/popperjs/popper-core/issues/1223
